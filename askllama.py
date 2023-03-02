@@ -31,7 +31,7 @@ def get_chatbot_responses(question, selected_characters):
     for character in selected_characters:
         # Set up the data for the API request
         data = {
-            "prompt": f"{character['prompt']} \nA:",
+            "prompt": f"{character['prompt']} \nQ: {question}\nA:",
             "temperature": 0.7,
             "max_tokens": 256,
             "top_p": 1,
@@ -41,6 +41,9 @@ def get_chatbot_responses(question, selected_characters):
             "n": 1,
             "user": character["name"]
         }
+
+        # Log the request for debugging
+        logging.info(f"API request for {character['name']}: {data}")
 
         # Make the API request and handle errors
         try:
