@@ -78,7 +78,7 @@ st.sidebar.title("Select Characters")
 selected_character_names = st.sidebar.multiselect(
     "Choose characters",
     options=[character["name"] for character in characters],
-    format_func=lambda name: f'<img src="{[character["image"] for character in characters if character["name"]==name][0]}" width="25" height="25"> {name}',
+    format_func=lambda name: name,
 )
 
 # Get the selected characters from the list of characters
