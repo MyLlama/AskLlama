@@ -24,7 +24,7 @@ def get_chatbot_responses(question, selected_characters):
     # Set up the headers for the API request
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer API_KEY",
+        "Authorization": "Bearer YOUR_API_KEY",
     }
 
     completions = []
@@ -56,7 +56,7 @@ def get_chatbot_responses(question, selected_characters):
 
             # Get the completion from the response and append the character name to it
             completion = response_data["choices"][0]["text"].strip()
-            completion_with_character = character["name"] + ": " + completion
+            completion_with_character = f"![{character['name']}]({character['image']}) {character['name']}: {completion}"
             completions.append(completion_with_character)
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             logging.error(f"Error while making the API request: {e}\n")
@@ -73,29 +73,61 @@ st.subheader("powered by Llama, www.myllama.co")
 
 # Define the sidebar with the list of characters
 st.sidebar.title("Select Characters")
-selected_characters = []
-for character in characters:
-    col1, col2 = st.sidebar.columns([0.2, 0.8])
-    image = col1.image(character["image"], width=50)
-    if col2.checkbox(character["name"], key=character["name"]):
-        selected_characters.append(character)
+
+# Define the dropdown menu for characters
+selected_character_names = st.sidebar.multiselect(
+    "Choose characters",
+    options=[character["name"] for character in characters],
+    format_func=lambda name: f'<img src="{[character["image"] for character in characters if character["name"]==name][0]}" width="25" height="25"> {name}',
+)
+
+# Get the selected characters from the list of characters
+selected_characters = [character for character in characters if character["name"] in selected_character_names]
 
 # Display an error message if no characters are selected
 if len(selected_characters) == 0:
     st.warning("Please select at least one character to start the chat.")
 else:
+    # Show the selected characters with their images
+    st.sidebar.title("Selected Characters")
+    for character in selected_characters:
+        col1, col2 = st.sidebar.columns([0.2, 0.8])
+        with col1:
+            st.image(character["image"], width=50)
+        with col2:
+            st.write(character["name"])
+
     # Define the chatbox
     chatbox = st.empty()
-
-    # Define the input field for the user's question
     question = st.text_input("Ask a question:")
 
-    # Process the user's question and display the chatbot response
     if st.button("Send"):
         completions = get_chatbot_responses(question, selected_characters)
         chatbot_response = "\n\n".join(completions)
         chatbox.write(chatbot_response)
-        
+        logging.info(f"This is completion::: {completions}\n")
+
 # Define the footer of the app
 st.markdown("---")
 st.markdown("This app is made for research purposes and not to hurt any sentiments.")
+
+# Hide the Streamlit menu and footer
+hide_streamlit_style = """
+<style>
+#MainMenu, footer {visibility: hidden;}
+footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        background-color: #f5f5f5;
+    }
+    .streamlit_container {
+        position: relative;
+        min-height: 100vh;
+    }
+</style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
