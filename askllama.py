@@ -7,13 +7,13 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 # Define the list of characters
 characters = [
-    {"name": "Krishna", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Lord Krishna would have answered."},
-    {"name": "Jesus", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Jesus Christ would have answered."},
-    {"name": "Osho", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Osho would have answered."},
-    {"name": "Buddha", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Buddha would have answered."},
-    {"name": "Guru Nanak", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Guru Nanak would have answered."},
-    {"name": "Prophet Mohammed", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Prophet Mohammed would have answered."},
-    {"name": "Mahavira", "image": "https://via.placeholder.com/150", "prompt": "Q: Answer this question as  Mahavira would have answered."},
+    {"name": "Krishna", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Lord Krishna would have answered."},
+    {"name": "Jesus", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Jesus Christ would have answered."},
+    {"name": "Osho", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Osho would have answered."},
+    {"name": "Buddha", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Buddha would have answered."},
+    {"name": "Guru Nanak", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Guru Nanak would have answered."},
+    {"name": "Prophet Mohammed", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Prophet Mohammed would have answered."},
+    {"name": "Mahavira", "image": "https://via.placeholder.com/50", "prompt": "Answer this question as  Mahavira would have answered."},
 ]
 
 # Define the function to get the chatbot response
@@ -24,7 +24,7 @@ def get_chatbot_responses(question, selected_characters):
     # Set up the headers for the API request
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer YOUR_API_KEY_HERE",
+        "Authorization": "Bearer API_KEY",
     }
 
     completions = []
@@ -43,7 +43,7 @@ def get_chatbot_responses(question, selected_characters):
         }
 
         # Log the request for debugging
-        logging.info(f"API request for {character['name']}: {data}")
+        logging.info(f"API request for {character['name']}: {data}\n")
 
         # Make the API request and handle errors
         try:
@@ -52,14 +52,14 @@ def get_chatbot_responses(question, selected_characters):
             response_data = response.json()
 
             # Log the API response for debugging
-            logging.info(response_data)
+            logging.info(f"API responce :{response_data}\n")
 
             # Get the completion from the response and append the character name to it
             completion = response_data["choices"][0]["text"].strip()
             completion_with_character = character["name"] + ": " + completion
             completions.append(completion_with_character)
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
-            logging.error(f"Error while making the API request: {e}")
+            logging.error(f"Error while making the API request: {e}\n")
             st.error(f"Error while making the API request for {character['name']}. Please try again later.")
 
     return completions
@@ -75,7 +75,9 @@ st.subheader("powered by Llama, www.myllama.co")
 st.sidebar.title("Select Characters")
 selected_characters = []
 for character in characters:
-    if st.sidebar.checkbox(character["name"], key=character["name"]):
+    col1, col2 = st.sidebar.columns([0.2, 0.8])
+    image = col1.image(character["image"], width=50)
+    if col2.checkbox(character["name"], key=character["name"]):
         selected_characters.append(character)
 
 # Display an error message if no characters are selected
@@ -83,7 +85,6 @@ if len(selected_characters) == 0:
     st.warning("Please select at least one character to start the chat.")
 else:
     # Define the chatbox
-    st.title("Chatbox")
     chatbox = st.empty()
 
     # Define the input field for the user's question
