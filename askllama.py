@@ -24,7 +24,7 @@ def get_chatbot_responses(question, selected_characters):
     # Set up the headers for the API request
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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",
+        "Authorization": "Bearer Your_API_KEY",
     }
 
     completions = []
