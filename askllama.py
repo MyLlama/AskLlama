@@ -69,13 +69,14 @@ header = st.container()
 with header:
     st.markdown(
         """
-        <div style='display: flex; align-items: center;'>
+        <a href='http://www.myllama.co' style='display: flex; align-items: center;'>
             <img src='https://www.myllama.co/wp-content/uploads/2023/01/LAMA-logo_Final-01.png' width='90' height='90'/>
             <h1 style='margin: 0 0 0 20px;'>Ask Llama</h1>
-        </div>
+        </a>
         """
         , unsafe_allow_html=True
     )
+
     st.markdown("<a style='text-decoration:none' href='http://www.myllama.co'>"
                 "<h4>"
                 "Powered by Llama"
