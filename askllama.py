@@ -7,7 +7,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 # Define the list of characters
 characters = [
-   {"name": "Krishna", "image": "https://via.placeholder.com/50", "prompt": "You are Lord Krishna, who is known for his teachings on righteousness, action and devotion, which can be found in the Bhagavad Gita, he is also known for his playful nature. Answer below question as Lord Krishna would have answered."},
+   {"name": "Krishna", "image": "/images/krishana.jpeg", "prompt": "You are Lord Krishna, who is known for his teachings on righteousness, action and devotion, which can be found in the Bhagavad Gita, he is also known for his playful nature. Answer below question as Lord Krishna would have answered."},
    {"name": "Jesus", "image": "https://via.placeholder.com/50", "prompt": "You are Jesus Christ,a central figure in Christianity, believed by Christians to be the son of God. his life and teachings are recorded in the New Testament of the Bible. Jesus is known for his teachings of love, compassion, and forgiveness, Answer Below question as Jesus"},
    {"name": "Osho", "image": "https://via.placeholder.com/50", "prompt": "You are Osho. He encouraged his followers to question traditional religious and social norms and to explore their own inner experiences and emotions.Answer below question as Osho would have answered."},
    {"name": "Buddha", "image": "https://via.placeholder.com/50", "prompt": "You are Buddha, who was a spiritual teacher and founder of Buddhism, one of the major religions of the world.Answer below question as Buddha would have answered"},
@@ -51,7 +51,7 @@ def get_chatbot_responses(question, selected_characters):
 
             # Get the completion from the response and append the character name to it
             completion = response_data["choices"][0]["message"]["content"].strip()
-            completion_with_character = f"![{character['name']}]({character['image']}) {character['name']}: {completion}"
+            completion_with_character = f"![<span style='color: orange'>{character['name']}</span>]({character['image']}) {character['name']}: {completion}"
             completions.append(completion_with_character)
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             logging.error(f"Error while making the API request: {e}\n")
@@ -60,18 +60,33 @@ def get_chatbot_responses(question, selected_characters):
     return completions
 
 
-
 # Define the app layout
-st.set_page_config(page_title="Ask Llama", page_icon=":llama:", layout="wide")
-st.title("Ask Llama")
-st.subheader("powered by Llama, www.myllama.co")
+st.set_page_config(page_title="Ask Llama", page_icon="https://www.myllama.co/wp-content/uploads/2023/01/cropped-android-chrome-512x512-1.png",  layout="wide")
+
+header = st.container()
+with header:
+    st.markdown(
+        """
+        <div style='display: flex; align-items: center;'>
+            <img src='https://www.myllama.co/wp-content/uploads/2023/01/LAMA-logo_Final-01.png' width='90' height='90'/>
+            <h1 style='margin: 0 0 0 20px;'>Ask Llama</h1>
+        </div>
+        """
+        , unsafe_allow_html=True
+    )
+    st.markdown("<a style='text-decoration:none' href='http://www.myllama.co'>"
+                "<h4>"
+                "Powered by Llama"
+                "</h4>"
+                "</a>",
+                unsafe_allow_html=True)
 
 # Define the sidebar with the list of characters
 st.sidebar.title("Select Characters")
 
 # Define the dropdown menu for characters
 selected_character_names = st.sidebar.multiselect(
-    "Choose characters",
+    "Choose characters to answer your question!",
     options=[character["name"] for character in characters],
     format_func=lambda name: name,
 )
@@ -81,7 +96,7 @@ selected_characters = [character for character in characters if character["name"
 
 # Display an error message if no characters are selected
 if len(selected_characters) == 0:
-    st.warning("Please select at least one character to start the chat.")
+    st.warning("Please select characters from sidebar to ask a question.")
 else:
     # Show the selected characters with their images
     st.sidebar.title("Selected Characters")
@@ -98,12 +113,12 @@ else:
 
     if st.button("Send"):
         completions = get_chatbot_responses(question, selected_characters)
-        chatbot_response = "\n\n".join(completions)
+        chatbot_response = "\n\n\n".join(completions)
         chatbox.write(chatbot_response)
 
 # Define the footer of the app
 st.markdown("---")
-st.markdown("This app is made for research purposes and not to hurt any sentiments.")
+st.markdown("This app is made for research purposes and not to hurt any sentiments. May occasionally generate incorrect, harmful or biased content.")
 
 # Hide the Streamlit menu and footer
 hide_streamlit_style = """
