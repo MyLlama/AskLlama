@@ -1,6 +1,35 @@
 import streamlit as st
 import requests
 import logging
+from PIL import ImageGrab
+import base64
+
+# Define a function to take a screenshot
+def take_screenshot():
+    image = ImageGrab.grab()
+    return image
+
+# Define a function to convert an image to a base64 string
+def image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    return img_str
+
+# Define the Streamlit app
+def app():
+    # Add a button to take a screenshot
+    if st.button("Take a screenshot and share"):
+        screenshot = take_screenshot()
+        st.image(screenshot, caption="Screenshot")
+        
+        # Add a button to share the screenshot on social media
+        if st.button("Share on social media"):
+            img_str = image_to_base64(screenshot)
+            url = "https://www.example.com/share?img={}".format(img_str)
+            st.write("Share this URL on social media: {}".format(url))
+
+
 
 # Set up logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -24,7 +53,7 @@ def get_chatbot_responses(question, selected_characters):
     # Set up the headers for the API request
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer ",
+        "Authorization": "Bearer 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",
     }
 
     completions = []
@@ -116,10 +145,6 @@ else:
         chatbot_response = "\n\n\n".join(completions)
         chatbox.write(chatbot_response)
 
-# Define the footer of the app
-st.markdown("---")
-st.markdown("This app is made for research purposes and not to hurt any sentiments. May occasionally generate incorrect, harmful or biased content.")
-
 # Hide the Streamlit menu and footer
 hide_streamlit_style = """
 <style>
@@ -140,3 +165,22 @@ footer {
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+# Define the footer of the app
+st.markdown("---")
+st.markdown("This app is made for research purposes and not to hurt any sentiments. May occasionally generate incorrect, harmful or biased content.")
+
+# Add a button to show the feedback form
+if st.button("Give feedback"):
+    # Add a text box for feedback
+    feedback = st.text_input("Feedback:")
+    
+    # Add a button to submit feedback
+    if st.button("Submit"):
+        # Print the feedback to the logs
+        logging.info(f"\n\n ***FEEDBACK*** :{feedback}\n\n")
+        st.success("Feedback submitted!")
+
+# Run the Streamlit app
+if __name__ == "__main__":
+    app()
