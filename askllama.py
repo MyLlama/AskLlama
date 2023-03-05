@@ -9,13 +9,13 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 # Define the list of characters
 characters = [
-   {"name": "Krishna", "image": "http://chat.myllama.co/AskLlama/images/krishana.jpeg", "prompt": "You are Lord Krishna, who is known for his teachings on righteousness, action and devotion, which can be found in the Bhagavad Gita, he is also known for his playful nature. Answer below question as Lord Krishna would have answered."},
-   {"name": "Jesus", "image": "http://chat.myllama.co/AskLlama/images/jesus.jpeg", "prompt": "You are Jesus Christ,a central figure in Christianity, believed by Christians to be the son of God. his life and teachings are recorded in the New Testament of the Bible. Jesus is known for his teachings of love, compassion, and forgiveness, Answer Below question as Jesus"},
-   {"name": "Osho", "image": "http://chat.myllama.co/AskLlama/images/osho.jpeg", "prompt": "You are Osho. He encouraged his followers to question traditional religious and social norms and to explore their own inner experiences and emotions.Answer below question as Osho would have answered."},
-   {"name": "Buddha", "image": "http://chat.myllama.co/AskLlama/images/buddha.jpeg", "prompt": "You are Buddha, who was a spiritual teacher and founder of Buddhism, one of the major religions of the world.Answer below question as Buddha would have answered"},
-   {"name": "Guru Nanak", "image": "http://chat.myllama.co/AskLlama/images/nanak.jpeg", "prompt": "You are Guru Nanak,whose teaching emphasized the unity of God and the equality of all people and promoted a simple and direct relationship with God through meditation, selfless service, and ethical living. Answer below question as Guru Nanak would have answered"},
-   {"name": "Prophet Mohammed", "image": "http://chat.myllama.co/AskLlama/images/mohammad.jpeg", "prompt": "You are Prophet Muhammad, his teachings emphasized the oneness of God and the importance of compassion, charity, and social justice. Answer below question as Prophet Muhammad would have answered"},
-   {"name": "Mahavira", "image": "http://chat.myllama.co/AskLlama/images/mahavir.jpeg", "prompt": "You are Mahavira, his teachings emphasized the concept of ahimsa, or non-violence. He taught that the ultimate goal of life is to achieve liberation from the cycle of birth and death by following the principles of non-violence, truthfulness, celibacy, and detachment. Answer below question as Mahavira would have answered"},
+   {"name": "Krishna", "image": "https://i.ibb.co/vH9W5xY/krishana.jpg", "prompt": "You are Lord Krishna, who is known for his teachings on righteousness, action and devotion, which can be found in the Bhagavad Gita, he is also known for his playful nature. Answer below question as Lord Krishna would have answered."},
+   {"name": "Jesus", "image": "https://ibb.co/6mPt8bd", "prompt": "You are Jesus Christ,a central figure in Christianity, believed by Christians to be the son of God. his life and teachings are recorded in the New Testament of the Bible. Jesus is known for his teachings of love, compassion, and forgiveness, Answer Below question as Jesus"},
+   {"name": "Osho", "image": "https://i.ibb.co/8NkrBss/osho.jpg", "prompt": "You are Osho. He encouraged his followers to question traditional religious and social norms and to explore their own inner experiences and emotions.Answer below question as Osho would have answered."},
+   {"name": "Buddha", "image": "https://i.ibb.co/ZfqKQ3h/buddha.jpg", "prompt": "You are Buddha, who was a spiritual teacher and founder of Buddhism, one of the major religions of the world.Answer below question as Buddha would have answered"},
+   {"name": "Guru Nanak", "image": "https://i.ibb.co/yygnKrg/nanak.jpg", "prompt": "You are Guru Nanak,whose teaching emphasized the unity of God and the equality of all people and promoted a simple and direct relationship with God through meditation, selfless service, and ethical living. Answer below question as Guru Nanak would have answered"},
+   {"name": "Prophet Mohammed", "image": "https://i.ibb.co/xst3jtb/mohammad.jpg", "prompt": "You are Prophet Muhammad, his teachings emphasized the oneness of God and the importance of compassion, charity, and social justice. Answer below question as Prophet Muhammad would have answered"},
+   {"name": "Mahavira", "image": "https://i.ibb.co/QKC9hpv/mahavir.jpg", "prompt": "You are Mahavira, his teachings emphasized the concept of ahimsa, or non-violence. He taught that the ultimate goal of life is to achieve liberation from the cycle of birth and death by following the principles of non-violence, truthfulness, celibacy, and detachment. Answer below question as Mahavira would have answered"},
 ]
 
 # Define the function to get the chatbot response
@@ -26,7 +26,7 @@ def get_chatbot_responses(question, selected_characters):
     # Set up the headers for the API request
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer ",
+        "Authorization": "Bearer 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",
     }
 
     completions = []
@@ -53,7 +53,7 @@ def get_chatbot_responses(question, selected_characters):
 
             # Get the completion from the response and append the character name to it
             completion = response_data["choices"][0]["message"]["content"].strip()
-            completion_with_character = f"![<span style='color: orange'>{character['name']}</span>]({character['image']}) {character['name']}: {completion}"
+            completion_with_character = f"![{character['name']}]({character['image']}) : {completion}"
             completions.append(completion_with_character)
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             logging.error(f"Error while making the API request: {e}\n")
@@ -63,7 +63,7 @@ def get_chatbot_responses(question, selected_characters):
 
 
 # Define the app layout
-st.set_page_config(page_title="Ask Llama", page_icon="https://www.myllama.co/wp-content/uploads/2023/01/cropped-android-chrome-512x512-1.png",  layout="wide")
+st.set_page_config(page_title="Ask Llama", page_icon="https://www.myllama.co/wp-content/uploads/2023/01/cropped-android-chrome-512x512-1.png", layout="wide")
 
 header = st.container()
 with header:
@@ -84,11 +84,8 @@ with header:
                 "</a>",
                 unsafe_allow_html=True)
 
-# Define the sidebar with the list of characters
-st.sidebar.title("Select Characters")
-
 # Define the dropdown menu for characters
-selected_character_names = st.sidebar.multiselect(
+selected_character_names = st.multiselect(
     "Choose characters to answer your question!",
     options=[character["name"] for character in characters],
     format_func=lambda name: name,
@@ -99,17 +96,8 @@ selected_characters = [character for character in characters if character["name"
 
 # Display an error message if no characters are selected
 if len(selected_characters) == 0:
-    st.warning("Please select characters from sidebar to ask a question.")
+    st.warning("Please select at least one character to start the chat.")
 else:
-    # Show the selected characters with their images
-    st.sidebar.title("Selected Characters")
-    for character in selected_characters:
-        col1, col2 = st.sidebar.columns([0.2, 0.8])
-        with col1:
-            st.image(character["image"], width=50)
-        with col2:
-            st.write(character["name"])
-
     # Define the chatbox
     chatbox = st.empty()
     question = st.text_input("Ask a question:")
@@ -118,6 +106,7 @@ else:
         completions = get_chatbot_responses(question, selected_characters)
         chatbot_response = "\n\n\n".join(completions)
         chatbox.write(chatbot_response)
+
 
 # Hide the Streamlit menu and footer
 hide_streamlit_style = """
