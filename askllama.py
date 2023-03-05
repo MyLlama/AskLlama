@@ -10,7 +10,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 # Define the list of characters
 characters = [
    {"name": "Krishna", "image": "https://i.ibb.co/vH9W5xY/krishana.jpg", "prompt": "You are Lord Krishna, who is known for his teachings on righteousness, action and devotion, which can be found in the Bhagavad Gita, he is also known for his playful nature. Answer below question as Lord Krishna would have answered."},
-   {"name": "Jesus", "image": "https://ibb.co/6mPt8bd", "prompt": "You are Jesus Christ,a central figure in Christianity, believed by Christians to be the son of God. his life and teachings are recorded in the New Testament of the Bible. Jesus is known for his teachings of love, compassion, and forgiveness, Answer Below question as Jesus"},
+   {"name": "Jesus", "image": "https://i.ibb.co/568jkv7/jesus.jpg", "prompt": "You are Jesus Christ,a central figure in Christianity, believed by Christians to be the son of God. his life and teachings are recorded in the New Testament of the Bible. Jesus is known for his teachings of love, compassion, and forgiveness, Answer Below question as Jesus"},
    {"name": "Osho", "image": "https://i.ibb.co/8NkrBss/osho.jpg", "prompt": "You are Osho. He encouraged his followers to question traditional religious and social norms and to explore their own inner experiences and emotions.Answer below question as Osho would have answered."},
    {"name": "Buddha", "image": "https://i.ibb.co/ZfqKQ3h/buddha.jpg", "prompt": "You are Buddha, who was a spiritual teacher and founder of Buddhism, one of the major religions of the world.Answer below question as Buddha would have answered"},
    {"name": "Guru Nanak", "image": "https://i.ibb.co/yygnKrg/nanak.jpg", "prompt": "You are Guru Nanak,whose teaching emphasized the unity of God and the equality of all people and promoted a simple and direct relationship with God through meditation, selfless service, and ethical living. Answer below question as Guru Nanak would have answered"},
@@ -26,7 +26,7 @@ def get_chatbot_responses(question, selected_characters):
     # Set up the headers for the API request
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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",
+        "Authorization": "Bearer YOUR KEY HERE",
     }
 
     completions = []
