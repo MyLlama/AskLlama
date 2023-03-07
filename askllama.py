@@ -89,17 +89,11 @@ with header:
         """
         , unsafe_allow_html=True
     )
-
-    st.markdown("<a style='text-decoration:none' href='http://www.myllama.co'>"
-                "<h4>"
-                "Powered by Llama"
-                "</h4>"
-                "</a>",
-                unsafe_allow_html=True)
+    st.markdown("---")
 
 # Define the dropdown menu for characters
 selected_character_names = st.multiselect(
-    "Choose characters to answer your question!",
+    "Please select the Masters you want to talk to!",
     options=[character["name"] for character in characters],
     format_func=lambda name: name,
 )
@@ -109,7 +103,7 @@ selected_characters = [character for character in characters if character["name"
 
 # Display an error message if no characters are selected
 if len(selected_characters) == 0:
-    st.warning("Please select at least one character to start the chat.")
+     chatbox = st.empty()
 else:
     # Define the chatbox
     chatbox = st.empty()
@@ -143,20 +137,6 @@ footer {
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-
-
-
-
-# Define the footer of the app
-st.markdown("---")
-col1, col2 = st.columns([2, 1])
-
-# Create a button to show the feedback form in the second column
-with col2:
-    feedback_text = st.text_input("Submit feedback or report an issue", max_chars=500)
-    # If the user submits feedback, print it to the console
-    if st.button("Submit Feedback"):
-        logging.info(f"User Feedback:{feedback_text}\n")
 hide_full_screen = '''
 <style>
     #ask-llama > div > a {visibility: hidden;}
@@ -164,21 +144,16 @@ hide_full_screen = '''
 '''
 
 st.markdown(hide_full_screen, unsafe_allow_html=True) 
-st.markdown("""
-<style>
-.footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: #f5f5f5;
-    color: #333;
-    padding: 10px;
-    text-align: center;
-}
-</style>
 
-<div class="footer">
-    This app is made for research purposes and not to hurt any sentiments. May occasionally generate incorrect, harmful or biased content.
-</div>
-""", unsafe_allow_html=True)
+
+
+# Define the footer of the app
+st.markdown("---")
+st.markdown("<a style='text-decoration:none' href='http://www.myllama.co'>"
+            "<h4>"
+            "Powered by Llama"
+            "</h4>"
+            "</a>",
+            unsafe_allow_html=True)
+st.markdown("This app is made for research purposes and not to hurt any sentiments. May occasionally generate incorrect or harmful content.",
+            unsafe_allow_html=True)
