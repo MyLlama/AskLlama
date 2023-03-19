@@ -2,7 +2,9 @@ import streamlit as st
 import requests
 import logging
 from PIL import ImageGrab
+from PIL import Image
 import base64
+import time
 
 # Set up logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -13,7 +15,6 @@ characters = [
    {"name": "Jesus", "image": "https://i.ibb.co/8jdfWc1/Christ.jpg", "prompt": "You are Jesus Christ,a central figure in Christianity, believed by Christians to be the son of God. his life and teachings are recorded in the New Testament of the Bible. Jesus is known for his teachings of love, compassion, and forgiveness, Answer Below question as Jesus"},
    {"name": "Buddha", "image": "https://i.ibb.co/fk7sBVn/Buddha.jpg", "prompt": "You are Buddha, who was a spiritual teacher and founder of Buddhism, one of the major religions of the world.Answer below question as Buddha would have answered"},
    {"name": "Guru Nanak", "image": "https://i.ibb.co/yygnKrg/nanak.jpg", "prompt": "You are Guru Nanak,whose teaching emphasized the unity of God and the equality of all people and promoted a simple and direct relationship with God through meditation, selfless service, and ethical living. Answer below question as Guru Nanak would have answered"},
-   {"name": "Prophet Mohammed", "image": "https://i.ibb.co/sQ3kNT5/islam.jpg", "prompt": "You are Prophet Muhammad, his teachings emphasized the oneness of God and the importance of compassion, charity, and social justice. Answer below question as Prophet Muhammad would have answered"},
    {"name": "Sadhguru", "image": "https://i.ibb.co/M23WFjv/Sadhguru-1.jpg", "prompt": "You are Sadhguru, a spiritual leader and founder of the Isha Foundation. Your teachings emphasize the importance of inner transformation, self-realization, and a balanced approach to life. Answer below question as Sadhguru would have answered."},
    {"name": "Osho", "image": "https://i.ibb.co/XkZtJx9/osho.jpg", "prompt": "You are Osho. He encouraged his followers to question traditional religious and social norms and to explore their own inner experiences and emotions.Answer below question as Osho would have answered."},
    {"name": "Swami Vivekananda", "image": "https://i.ibb.co/Qc5Lw2M/Swami-vivekananda.jpg", "prompt": "You are Swami Vivekananda, a key figure in the introduction of Indian philosophies of Vedanta and Yoga to the Western world. Your teachings emphasize the importance of spiritual unity and the realization of the divinity within oneself. Answer below question as Swami Vivekananda would have answered."},
@@ -29,49 +30,58 @@ characters = [
    {"name": "Carl jung", "image": "https://i.ibb.co/NYGc6J4/Gustav-Jung-1.jpg", "prompt": "You are Carl Jung, a Swiss psychiatrist and founder of analytical psychology. Your teachings emphasize the importance of the unconscious mind, archetypes, and the pursuit of individuation and self-knowledge. Answer below question as Carl Jung would have"},
 ]
 
+def display_typing_effect(character_name, character_image, completion, chatbox):
+    character_header = f"![{character_name}]({character_image}) : "
+    updated_chat = st.session_state.chat_history + "\n\n" + character_header
+    chatbox.markdown(updated_chat, unsafe_allow_html=True)
+
+    for char in completion:
+        updated_chat += char
+        chatbox.markdown(updated_chat, unsafe_allow_html=True)
+        time.sleep(0.03)  # Adjust the sleep time to control the typing speed
+
+    st.session_state.chat_history = updated_chat
+
 # Define the function to get the chatbot response
 def get_chatbot_responses(question, selected_characters):
-    # Define the URL of the ChatGPT API endpoint
-    url = "https://api.openai.com/v1/chat/completions"
-
-    # Set up the headers for the API request
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer ",
-    }
-
-    completions = []
     for character in selected_characters:
+        # Define the URL of the ChatGPT API endpoint
+        url = "https://api.openai.com/v1/chat/completions"
+
+        # Set up the headers for the API request
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer sk-",
+        }
+
         # Set up the data for the API request
         data = {
             "model": "gpt-3.5-turbo",
-            "messages": [{"role": "system", "content": f"{character['prompt']}"}, 
-                         {"role": "user", "content": f"Q: {question}\n"}]
-            
+            "messages": [{"role": "system", "content": f"{character['prompt']}"}] + st.session_state.character_history[character['name']] + [{"role": "user", "content": f"Q: {question}\n"}],
         }
-
+        
         # Log the request for debugging
         logging.info(f"User Question {question}\n")
         logging.info(f"API request for {character['name']}: {data}\n")
 
         # Make the API request and handle errors
         try:
-            response = requests.post(url, headers=headers, json=data)
-            response.raise_for_status()  # raise an exception if status code is not 2xx
-            response_data = response.json()
+            with st.spinner(f"Getting response for {character['name']}..."):
+                response = requests.post(url, headers=headers, json=data)
+                response.raise_for_status()  # raise an exception if status code is not 2xx
+                response_data = response.json()
 
-            # Log the API response for debugging
-            logging.info(f"API responce :{response_data}\n")
+                # Log the API response for debugging
+                logging.info(f"API responce :{response_data}\n")
 
-            # Get the completion from the response and append the character name to it
-            completion = response_data["choices"][0]["message"]["content"].strip()
-            completion_with_character = f"![{character['name']}]({character['image']}) : {completion}"
-            completions.append(completion_with_character)
+                # Get the completion from the response and append the character name to it
+                completion = response_data["choices"][0]["message"]["content"].strip()
+                completion_with_character = f"![{character['name']}]({character['image']}) : {completion}"
+                display_typing_effect(character['name'], character['image'], completion, chatbox)
+                st.session_state.character_history[character['name']].append({"role": "assistant", "content": completion})
         except (requests.exceptions.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             logging.error(f"Error while making the API request: {e}\n")
             st.error(f"Error while making the API request for {character['name']}. Please try again later.")
-
-    return completions
 
 
 # Define the app layout
@@ -91,30 +101,41 @@ with header:
     )
     st.markdown("---")
 
-# Define the dropdown menu for characters
-selected_character_names = st.multiselect(
-    "Please select the Masters you want to talk to!",
-    options=[character["name"] for character in characters],
-    format_func=lambda name: name,
-)
+# Define the list of characters with checkboxes
+st.write("Please select the Masters you want to talk to:")
 
-# Get the selected characters from the list of characters
-selected_characters = [character for character in characters if character["name"] in selected_character_names]
+if 'selected_characters' not in st.session_state:
+    st.session_state.selected_characters = {}
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = ""
+if 'character_history' not in st.session_state:
+    st.session_state.character_history = {character['name']: [] for character in characters}
 
-# Display an error message if no characters are selected
-if len(selected_characters) == 0:
-     chatbox = st.empty()
-else:
-    # Define the chatbox
-    chatbox = st.empty()
-    question = st.text_input("Ask a question:")
-  
+num_columns = 9  # Define the number of columns for the grid
+num_rows = (len(characters) + num_columns - 1) // num_columns
+rows = [st.columns(num_columns) for _ in range(num_rows)]
 
-    if st.button("Send"):
-        completions = get_chatbot_responses(question, selected_characters)
-        chatbot_response = "\n\n\n".join(completions)
-        chatbox.write("User Question: " +question +"\n\n"+ chatbot_response)
+for i, character in enumerate(characters):
+    row, col = divmod(i, num_columns)
+    with rows[row][col]:
+        image_url = character["image"]
+        st.image(image_url, width=50, caption=None, use_column_width=None, clamp=False, channels='RGB', output_format='auto')
+        
+        if st.checkbox(f"{character['name']}"):
+            if character['name'] not in st.session_state.selected_characters:
+                st.session_state.selected_characters[character['name']] = character
+        else:
+            if character['name'] in st.session_state.selected_characters:
+                st.session_state.selected_characters.pop(character['name'])
 
+            
+# Define the chatbox
+chatbox = st.empty()
+question = st.text_input("Ask a question:")
+
+if st.button("Send"):
+    get_chatbot_responses(question, list(st.session_state.selected_characters.values()))
+    chatbox.markdown(st.session_state.chat_history, unsafe_allow_html=True)
 
 # Hide the Streamlit menu and footer
 hide_streamlit_style = """
@@ -132,6 +153,12 @@ footer {
     .streamlit_container {
         position: relative;
         min-height: 100vh;
+    }
+    .css-1li7dat, .css-1li7dat {
+        visibility: hidden!important;
+    }
+    .element-container button {
+        display: none!important;
     }
 </style>
 """
