@@ -111,6 +111,32 @@ if 'chat_history' not in st.session_state:
 if 'character_history' not in st.session_state:
     st.session_state.character_history = {character['name']: [] for character in characters}
 
+character_names = [character["name"] for character in characters]
+selected_character_names = st.multiselect("Select the characters:", character_names)
+
+st.session_state.selected_characters = {
+    character["name"]: character for character in characters if character["name"] in selected_character_names
+}
+
+# Define the list of characters with checkboxes
+with st.beta_expander("Select the Masters you want to talk to"):
+    num_columns = 9  # Define the number of columns for the grid
+    num_rows = (len(characters) + num_columns - 1) // num_columns
+    rows = [st.columns(num_columns) for _ in range(num_rows)]
+
+    for i, character in enumerate(characters):
+        row, col = divmod(i, num_columns)
+        with rows[row][col]:
+            image_url = character["image"]
+            st.image(image_url, width=50, caption=None, use_column_width=None, clamp=False, channels='RGB', output_format='auto')
+            
+            if st.checkbox(f"{character['name']}"):
+                if character['name'] not in st.session_state.selected_characters:
+                    st.session_state.selected_characters[character['name']] = character
+            else:
+                if character['name'] in st.session_state.selected_characters:
+                    st.session_state.selected_characters.pop(character['name'])
+
 num_columns = 9  # Define the number of columns for the grid
 num_rows = (len(characters) + num_columns - 1) // num_columns
 rows = [st.columns(num_columns) for _ in range(num_rows)]
@@ -157,8 +183,14 @@ footer {
     .css-1li7dat, .css-1li7dat {
         visibility: hidden!important;
     }
-    .element-container button {
+    .element-container .css-6awftf, .css-18ni7ap {
         display: none!important;
+    }
+    header {
+       display: none!important;
+    }
+    .css-z5fcl4 {
+        padding: 3rem 4rem 10rem!important;
     }
 </style>
 """
