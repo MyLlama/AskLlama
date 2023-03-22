@@ -111,33 +111,29 @@ if 'chat_history' not in st.session_state:
 if 'character_history' not in st.session_state:
     st.session_state.character_history = {character['name']: [] for character in characters}
 
-# Define the list of characters with checkboxes
-with st.expander("Select the Masters you want to talk to"):
-    num_columns = 9  # Define the number of columns for the grid
-    num_rows = (len(characters) + num_columns - 1) // num_columns
-    rows = [st.columns(num_columns) for _ in range(num_rows)]
 
-    for i, character in enumerate(characters):
-        row, col = divmod(i, num_columns)
-        with rows[row][col]:
-            image_url = character["image"]
-            st.image(image_url, width=50, caption=None, use_column_width=None, clamp=False, channels='RGB', output_format='auto')
-            
-            if st.checkbox(f"{character['name']}"):
-                if character['name'] not in st.session_state.selected_characters:
-                    st.session_state.selected_characters[character['name']] = character
-            else:
-                if character['name'] in st.session_state.selected_characters:
-                    st.session_state.selected_characters.pop(character['name'])
+character_names = [character["name"] for character in characters]
+selected_character_names = st.multiselect("Select the characters:", character_names)
 
+st.session_state.selected_characters = {
+    character["name"]: character for character in characters if character["name"] in selected_character_names
+}
+
+user_avatar = "https://secure.gravatar.com/avatar/84e1cab23663f968345fafb812c73a85?s=50&d=mm&r=g"  
             
 # Define the chatbox
 chatbox = st.empty()
 question = st.text_input("Ask a question:")
 
 if st.button("Send"):
-    get_chatbot_responses(question, list(st.session_state.selected_characters.values()))
-    chatbox.markdown(st.session_state.chat_history, unsafe_allow_html=True)
+    if not st.session_state.selected_characters:
+        st.warning("Please select at least one character to proceed.")
+    else:
+        if question:
+            st.session_state.chat_history += f'\n\n![User]({user_avatar}) **You**: {question}'
+            chatbox.markdown(st.session_state.chat_history, unsafe_allow_html=True)
+        get_chatbot_responses(question, list(st.session_state.selected_characters.values()))
+        chatbox.markdown(st.session_state.chat_history, unsafe_allow_html=True)
 
 # Hide the Streamlit menu and footer
 hide_streamlit_style = """
