@@ -51,7 +51,7 @@ def get_chatbot_responses(question, selected_characters):
         # Set up the headers for the API request
         headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer sk-",
+            "Authorization": "Bearer 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",
         }
 
         # Set up the data for the API request
@@ -164,6 +164,12 @@ footer {
     .css-z5fcl4 {
         padding: 3rem 4rem 10rem!important;
     }
+    .css-164nlkn {
+        display: none;
+    }
+    header.css-18ni7ap {
+        display: none!important;
+        }
 </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
